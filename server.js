@@ -21,11 +21,15 @@ const server = http.createServer(app);
 // Socket.io — Render uyumlu CORS ve credentials
 const io = require('socket.io')(server, {
   cors: {
-    origin: '*',
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true,
+    allowedHeaders: ['*'],
   },
   allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  transports: ['polling', 'websocket'],
 });
 
 app.set('trust proxy', 1); // Render load balancer'ı için
