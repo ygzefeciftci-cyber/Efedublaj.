@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="application-name" content="efedublaj"/>
+<meta name="description" content="Sahneyi arkadaşlarınla diblendir, karakterin seslendir ve beraber izle. Ücretsiz."/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="efedublaj"/>
+<meta property="og:title" content="efedublaj — Arkadaşlarla Dublaj"/>
+<meta property="og:description" content="Sahneyi arkadaşlarınla diblendir, karakterin seslendir ve beraber izle. Ücretsiz."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<title>efedublaj — Ücretsiz Dublaj Oyunu</title>
+</head>
+<body>
+
+<header class="header">
+  <div class="container navbar">
+    <a href="#landing" class="brand nav-link">efe<span class="mark">dublaj</span></a>
+    <nav class="nav-links" id="nav-links">
+      <a href="#landing" class="nav-link">Ana Sayfa</a>
+      <a href="#scenes" class="nav-link">Sahneler</a>
+      <a href="#dubs" class="nav-link">Dublajlar</a>
+    </nav>
+    <div class="nav-actions" id="nav-actions">
+      <a href="#auth" class="btn sm ghost" id="btn-auth">Giriş / Kayıt</a>
+    </div>
+  </div>
+</header>
+
+<!-- ========== LANDING ========== -->
+<section id="view-landing" class="view hero">
+  <div class="container">
+    <div class="eyebrow">Sahneyi aç</div>
+    <h1>Dublaj et.<br/><span class="soft">Arkadaşlarınla beraber.</span></h1>
+    <p>Bir oda aç, kodu paylaş, karakterini seç, repliklerini kaydet ve beraber son videoyu izle. Hepsi ücretsiz.</p>
+
+    <div class="hero-grid">
+      <div class="panel">
+        <div class="panel-title">Yeni oda aç</div>
+        <p class="text-ink-soft" style="font-size:0.9rem; margin-bottom:1rem;">Oda için isim ver (isteğe bağlı) ve başlat.</p>
+        <div class="input-wrap">
+          <input id="room-name" type="text" placeholder="Oda ismi (örn. Efe & Arkadaşlar)" maxlength="40"/>
+        </div>
+        <button id="btn-create" class="btn rec full">Odayı Oluştur</button>
+      </div>
+
+      <div class="panel dark">
+        <div class="panel-title">Odaya katıl</div>
+        <p class="text-ink-soft" style="font-size:0.9rem; margin-bottom:1rem;">Arkadaşından aldığım 6 haneli kodu gir.</p>
+        <div class="input-wrap">
+          <input id="room-join" type="text" placeholder="ABCDEF" maxlength="6" style="text-transform:uppercase; text-align:center; letter-spacing:0.2em;"/>
+        </div>
+        <button id="btn-join" class="btn sm full">Katıl</button>
+      </div>
+    </div>
+
+    <div class="hero-grid" style="margin-top:1.5rem;">
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-title">Nasıl oynanır?</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div><strong>Oda aç</strong> ve kodu arkadaşlarınla paylaş.</div></div>
+          <div class="step"><div class="step-num">2</div><div><strong>Karakter seç</strong> — kim hangi replikle kalkacak, sen seçersin.</div></div>
+          <div class="step"><div class="step-num">3</div><div><strong>Kayıt et</strong> — sahneyi izleyip sırada olduğunda replikini kaydet.</div></div>
+          <div class="step"><div class="step-num">4</div><div><strong>Beraber izle</strong> — tüm take'lar tek videoda birleşir.</div></div>
+        </div>
+        <p class="text-ink-faint" style="font-size:0.8rem; margin-top:0.75rem;">Kamera ve mikrofon erişimi senin izninle kullanılır; hiçbir şey ücretli değil.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AUTH ========== -->
+<section id="view-auth" class="view" style="display:none;">
+  <div class="container" style="max-width:400px; margin:4rem auto;">
+    <div class="card" style="padding:2rem;">
+      <h2 class="section-title" style="text-align:center; margin-bottom:1.5rem;">Hesap</h2>
+      <div id="auth-tabs" style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid var(--dj-line); pb-bottom:0.5rem;">
+        <button class="tab active" data-tab="login">Giriş Yap</button>
+        <button class="tab" data-tab="signup">Kayıt Ol</button>
+      </div>
+      <form id="auth-form">
+        <div class="input-wrap" style="margin-bottom:1rem;">
+          <label class="dj-label">E-posta</label>
+          <input type="email" name="email" placeholder="email@example.com" required/>
+        </div>
+        <div class="input-wrap" style="margin-bottom:1rem;">
+          <label class="dj-label">İsim</label>
+          <input type="text" name="name" placeholder="İsminiz" required/>
+        </div>
+        <div class="input-wrap" style="margin-bottom:1.5rem;">
+          <label class="dj-label">Şifre</label>
+          <input type="password" name="password" placeholder="••••••••" required/>
+        </div>
+        <button type="submit" class="btn rec full" id="auth-submit">Giriş Yap</button>
+      </form>
+      <p style="text-align:center; margin-top:1rem; color:var(--dj-ink-soft); font-size:0.85rem;">
+        Henüz hesabın yok mu? <button type="button" class="tab" onclick="switchTab('signup')" style="background:none; border:none; color:var(--dj-rec); cursor:pointer; padding:0;">Kayıt ol</button>
+      </p>
+    </div>
+    <p style="text-align:center; margin-top:1rem; color:var(--dj-ink-faint); font-size:0.8rem;">
+      <a href="#landing" class="nav-link">← Geri dön</a>
+    </p>
+  </div>
+</section>
+
+<!-- ========== SCENES ========== -->
+<section id="view-scenes" class="view section" style="display:none;">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">Sahne kataloğu</span>
+      <h2 class="section-title">Video sahne <span class="accent">seçin</span></h2>
+    </div>
+    <div class="scenes" id="scenes-grid">
+      <!-- JS ile doldurulur -->
+    </div>
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="#landing" class="btn sm">← Ana sayfaya dön</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== LOBBY ========== -->
+<section id="view-lobby" class="view section" style="display:none;">
+  <div class="container">
+    <div class="navbar" style="justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <div class="brand" style="font-size:1rem;">efedublaj · <span id="lobby-room-code" class="text-rec font-mono"></span></div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span id="lobby-users-count" class="text-ink-faint font-mono">0 kişi</span>
+        <button id="btn-leave-lobby" class="btn sm">Çıkış</button>
+      </div>
+    </div>
+
+    <div id="lobby-content" style="display:grid; gap:1rem;">
+      <!-- JS ile doldurulur -->
+    </div>
+  </div>
+</section>
+
+<!-- ========== PLAYER / ROOM ========== -->
+<section id="view-player" class="view section" style="display:none;">
+  <div class="container">
+    <div class="navbar" style="justify-content:space-between; align-items:center; margin-bottom:1rem;">
+      <div class="brand" style="font-size:1rem;">efedublaj · <span id="player-room-code" class="text-rec font-mono"></span></div>
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span id="player-users-count" class="text-ink-faint font-mono">0 kişi</span>
+        <button id="btn-leave-player" class="btn sm">Odadan Çık</button>
+      </div>
+    </div>
+
+    <div id="player-grid" style="display:grid; gap:0.75rem; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); margin-bottom:1rem;">
+      <!-- oyuncu kartları -->
+    </div>
+
+    <div class="card stage-wrap" style="border:1px solid var(--dj-line); background:#000; border-radius:var(--dj-radius); overflow:hidden; margin-bottom:0.75rem;">
+      <div id="video-stage" style="aspect-ratio:16/9; background:#000; display:flex; align-items:center; justify-content:center; color:var(--dj-ink-faint); font-family:var(--dj-font-mono); font-size:0.9rem;">
+        Sahne seçilmedi — oda sahibi bir sahne seçmelidir
+      </div>
+      <div style="padding:0.85rem; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap;">
+        <div id="player-scene-info" class="text-ink-soft font-mono" style="font-size:0.85rem;">—</div>
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <button id="btn-record" class="btn rec sm">Kayıt Başlat</button>
+          <button id="btn-stop-record" class="btn sm ghost" style="display:none;">Durdur</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem; height:220px; overflow:auto; border:1px solid var(--dj-line); background:var(--dj-surface-alt); border-radius:var(--dj-radius);">
+      <div style="padding:0.75rem 1rem; border-bottom:1px solid var(--dj-line); font-size:0.75rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--dj-ink-faint);">Sohbet</div>
+      <div id="player-chat-box" style="padding:0.75rem 1rem; font-size:0.85rem; color:var(--dj-ink-soft); display:flex; flex-direction:column; gap:0.5rem;">
+        <!-- mesajlar -->
+      </div>
+      <div style="display:flex; gap:0.5rem; padding:0.5rem 1rem; border-top:1px solid var(--dj-line);">
+        <input id="player-chat-input" type="text" placeholder="Mesaj yaz..." style="flex:1; background:var(--dj-bg); border:1px solid var(--dj-line); color:var(--dj-ink); padding:0.6rem 0.8rem; border-radius:6px; font-family:inherit;"/>
+        <button id="btn-send-chat" class="btn sm">Gönder</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== DUBS / RECORDINGS ========== -->
+<section id="view-dubs" class="view section" style="display:none;">
+  <div class="container">
+    <div class="section-header">
+      <span class="kicker">Senin dublajların</span>
+      <h2 class="section-title">Kayıtların ve birleştirilmiş videolar</h2>
+    </div>
+    <div id="dubs-list" style="display:grid; gap:1rem; grid-template-columns:1fr;">
+      <!-- JS ile doldurulur -->
+    </div>
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="#landing" class="btn sm">← Ana sayfaya dön</a>
+    </div>
+  </div>
+</section>
+
+<!-- Bilgi / hata toast -->
+<div id="toast" style="position:fixed; inset:auto 1rem 1rem auto; z-index:100; background:var(--dj-surface); border:1px solid var(--dj-line); color:var(--dj-ink); padding:0.75rem 1rem; border-radius:var(--dj-radius); box-shadow:var(--dj-shadow); display:none; font-size:0.9rem;"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
