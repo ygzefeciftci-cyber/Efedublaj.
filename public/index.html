@@ -117,6 +117,20 @@
     <div class="scenes" id="scenes-grid">
       <!-- JS ile doldurulur -->
     </div>
+    <div id="scene-video-upload" style="display:none; margin-top:1.5rem; padding:1rem; background:var(--dj-surface-alt); border:1px solid var(--dj-line); border-radius:var(--dj-radius);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <span class="dj-label">Sahne Video Yükle</span>
+        <span style="font-size:0.75rem; color:var(--dj-ink-faint);">Sahneye video ekleyin</span>
+      </div>
+      <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+        <select id="scene-video-select" style="flex:1; min-width:200px; background:var(--dj-bg); border:1px solid var(--dj-line); color:var(--dj-ink); padding:0.6rem 0.8rem; border-radius:6px; font-family:inherit;">
+          <option value="">Sahne seçin</option>
+        </select>
+        <input type="file" id="scene-video-file" accept="video/*" style="background:var(--dj-bg); border:1px solid var(--dj-line); color:var(--dj-ink); padding:0.6rem 0.8rem; border-radius:6px; font-family:inherit;"/>
+        <button id="btn-upload-scene-video" class="btn sm rec" style="width:auto;">Yükle</button>
+      </div>
+      <div id="scene-video-msg" style="margin-top:0.5rem; font-size:0.8rem; color:var(--dj-ink-soft);"></div>
+    </div>
     <div style="text-align:center; margin-top:1.5rem;">
       <a href="#landing" class="btn sm">← Ana sayfaya dön</a>
     </div>

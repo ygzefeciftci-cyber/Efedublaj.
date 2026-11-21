@@ -2,7 +2,10 @@
 (() => {
   // Socket.io bağlantısı — Render uyumlu
   const socket = io({
-    transports: ['websocket', 'polling'],
+    transports: ['polling', 'websocket'],
+    reconnection: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
   });
 
   // ---------- state ----------
@@ -10,6 +13,7 @@
   let myRoomCode = null;    // current room code
   let mySocketId = socket.id;
   let dbScenes = [];
+  let socketConnected = false;
 
   // ---------- DOM helpers ----------
   const $ = s => document.querySelector(s);
@@ -56,10 +60,12 @@
       const { user } = await api('/api/me');
       myUser = user;
       updateAuthUI();
+      updateSceneUploadUI();
       return user;
     } catch (e) {
       myUser = null;
       updateAuthUI();
+      updateSceneUploadUI();
       return null;
     }
   }
@@ -74,6 +80,7 @@
           myUser = null;
           myRoomCode = null;
           updateAuthUI();
+          updateSceneUploadUI();
           showView('landing');
         });
       };
@@ -81,6 +88,23 @@
       btn.textContent = 'Giriş / Kayıt';
       btn.onclick = () => showView('auth');
     }
+  }
+
+  function updateSceneUploadUI() {
+    const section = $('#scene-video-upload');
+    if (!section) return;
+    if (myUser) {
+      section.style.display = 'block';
+      loadSceneSelect();
+    } else {
+      section.style.display = 'none';
+    }
+  }
+
+  async function loadSceneSelect() {
+    const sel = $('#scene-video-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Sahne seçin</option>' + dbScenes.map(s => `<option value="${s.id}">${esc(s.title)}</option>`).join('');
   }
 
   // ---------- Auth view ----------
@@ -143,7 +167,6 @@
     $('#lobby-users-count').textContent = `${room.users.length} kişi`;
 
     const me = room.users.find(u => u.id === myUser.id);
-    const others = room.users.filter(u => u.id !== myUser.id);
     const isOwner = room.owner === myUser.id;
 
     const playersHtml = room.users.map(u => `
@@ -154,8 +177,6 @@
       </div>
     `).join('');
 
-    const isOwner = room.owner === myUser.id;
-
     // Sahne seçimi (sadece sahip)
     let scenePickerHtml = '';
     if (isOwner) {
@@ -165,7 +186,7 @@
           <div id="scene-picker" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem;">
             ${dbScenes.map(s => {
               const selected = s.id === room.sceneId;
-              const hasVideo = s.video ? ' (video var)' : ' (video yok)';
+              const hasVideo = s.video ? ' ✓' : '';
               return `<button class="btn sm ${selected ? 'rec' : 'ghost'}" data-id="${s.id}">${esc(s.title)}${hasVideo}</button>`;
             }).join('')}
           </div>
@@ -191,7 +212,7 @@
       </div>
       ${scenePickerHtml}
       <div style="margin-bottom:1rem;">
-        <label class="dj-label">Karakteriniz (sahne karakter sayısı kadar)</label>
+        <label class="dj-label">Karakteriniz (1-6)</label>
         <div id="char-picker" style="display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.5rem;">
           ${Array.from({length: 6}, (_, i) => i + 1).map(n => `
             <button class="btn sm ${me && me.char === String(n) ? 'rec' : 'ghost'}" data-char="${n}">Karakter ${n}</button>
@@ -256,6 +277,7 @@
   async function loadScenes() {
     try {
       dbScenes = await api('/api/scenes');
+      loadSceneSelect();
     } catch (e) {
       dbScenes = [];
     }
@@ -275,7 +297,7 @@
           </div>
           <div class="scene-body">
             <div class="scene-title">${esc(s.title)}</div>
-            <div class="scene-meta">${s.chars} karakter · ${esc(hasVideo)}</div>
+            <div class="scene-meta ${videoColor}">${s.chars} karakter · ${esc(hasVideo)}</div>
           </div>
         </a>
       `;
@@ -289,6 +311,33 @@
       });
     });
   }
+
+  // Sahne video yükle
+  $('#btn-upload-scene-video').addEventListener('click', async () => {
+    const sel = $('#scene-video-select');
+    const fileInput = $('#scene-video-file');
+    const sceneId = sel.value;
+    const file = fileInput.files[0];
+    const msgEl = $('#scene-video-msg');
+
+    if (!sceneId) { toast('Sahne seçin'); return; }
+    if (!file) { toast('Video dosyası seçin'); return; }
+
+    const form = new FormData();
+    form.append('video', file);
+    try {
+      msgEl.textContent = 'Yükleniyor...';
+      const res = await api(`/api/scenes/${sceneId}/video`, { method: 'POST', body: form });
+      msgEl.textContent = 'Video yüklendi!';
+      fileInput.value = '';
+      loadScenes();
+      renderScenes();
+      setTimeout(() => { msgEl.textContent = ''; }, 2000);
+    } catch (err) {
+      msgEl.textContent = 'Hata: ' + (err.message || '');
+      toast('Video yükleme hatası: ' + (err.message || ''));
+    }
+  });
 
   // ---------- Player view ----------
   let mediaRecorder = null;
@@ -394,7 +443,22 @@
   }
 
   // ---------- Socket events ----------
-  socket.on('connect', () => { mySocketId = socket.id; });
+  socket.on('connect', () => {
+    mySocketId = socket.id;
+    socketConnected = true;
+    // Eğer zaten bir odadayızsa yeniden katıl
+    if (myRoomCode && myUser) {
+      socket.emit('join-room', { code: myRoomCode, name: myUser.name });
+    }
+  });
+  socket.on('disconnect', () => {
+    socketConnected = false;
+    toast('Bağlantı koptu, yeniden bağlanılıyor…');
+  });
+  socket.on('connect_error', (err) => {
+    socketConnected = false;
+    toast('Sunucuya bağlanılamıyor: ' + (err.message || ''));
+  });
   socket.on('room-state', (room) => {
     myRoomCode = room.code;
     renderLobby(room);
